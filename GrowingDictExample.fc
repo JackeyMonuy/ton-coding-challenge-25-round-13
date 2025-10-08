@@ -1,0 +1,21 @@
+;; Wrong approach: appends large random data for every call, wasting storage
+
+() recv_internal(cell in_msg_body, slice in_msg) impure {
+    ;; Initialize or load dictionary
+    var dict = get_data().begin_parse()~load_dict();
+
+    ;; Use random key based on current block time
+    var key = int_hash(now());
+
+    ;; Store large dummy data
+    var big_data = begin_cell()
+        .store_uint(rand(999999999), 64)
+        .store_ref(in_msg_body)
+        .end_cell();
+
+    dict~udict_set_ref(64, key, big_data);
+
+    set_data(begin_cell()
+        .store_dict(dict)
+        .end_cell());
+}
